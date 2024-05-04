@@ -10,7 +10,7 @@ del_message = []
 
 def get_message():
     try:
-        for m in range (10):
+        for m in range (1, 10):
             response = sqs.receive_message(
                 QueueUrl=url,
                 AttributeNames=[
@@ -28,22 +28,23 @@ def get_message():
 
             #print(f"Order: {order}")
             #print(f"Word: {word}")
-            list1.append((order, word))
+            list1.append(("Order: {order}","Word: {word}" ))
             del_message.append(handle)
-            ordered_message = list1.sort(key = lambda x: x[0])
-            print(ordered_message)
-
         else:
             print("No message in the queue")
             exit(1)
-        #for d in del_message:
-            #sqs.delete_message(
-                #QueueUrl=url,
-                #ReceiptHandle=handle
-           # )
-        #print("The messages have been deleted")
+        for d in del_message:
+            sqs.delete_message(
+                QueueUrl=url,
+                ReceiptHandle=handle
+            )
+        print("The messages have been deleted")
     except ClientError as e:
         print(e.response['Error']['Message'])
+
+ordered_message = list1.sort(key = lambda x: x[0])
+print(ordered_message)
+
 
 if __name__ == "__main__":
     get_message()
