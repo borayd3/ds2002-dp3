@@ -5,8 +5,7 @@ import json
 
 url = "https://sqs.us-east-1.amazonaws.com/440848399208/ngx3fy"
 sqs = boto3.client('sqs')
-
-dict1 = {}
+list1 = []
 del_message = []
 
 def get_message():
@@ -17,7 +16,7 @@ def get_message():
                 AttributeNames=[
                     'All'
                 ],
-                MaxNumberOfMessages=1,
+                MaxNumberOfMessages=10,
                 MessageAttributeNames=[
                     'All'
                 ]
@@ -29,24 +28,22 @@ def get_message():
 
             #print(f"Order: {order}")
             #print(f"Word: {word}")
-            unorder_message = {order: word}
-            dict1.update(unorder_message)
+            list1.append((order, word))
             del_message.append(handle)
+            ordered_message = list1.sort(key = lambda x: x[0])
+            print(ordered_message)
 
         else:
             print("No message in the queue")
             exit(1)
-        for d in del_message:
-            sqs.delete_message(
-                QueueUrl=url,
-                ReceiptHandle=handle
-            )
-        print("The message has been deleted")
+        #for d in del_message:
+            #sqs.delete_message(
+                #QueueUrl=url,
+                #ReceiptHandle=handle
+           # )
+        #print("The messages have been deleted")
     except ClientError as e:
         print(e.response['Error']['Message'])
-
-ordered_message = sorted(dict1, key=lambda x: x['order'])
-print(ordered_message)
 
 if __name__ == "__main__":
     get_message()
