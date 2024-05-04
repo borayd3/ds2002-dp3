@@ -1,5 +1,3 @@
-#!/home/gitpod/.pyenv/shims/python3
-
 import boto3
 from botocore.exceptions import ClientError
 import requests
@@ -9,6 +7,16 @@ import json
 url = "https://sqs.us-east-1.amazonaws.com/440848399208/ngx3fy"
 sqs = boto3.client('sqs')
 
+def delete_message(handle):
+    try:
+        # Delete message from SQS queue
+        sqs.delete_message(
+            QueueUrl=url,
+            ReceiptHandle=handle
+        )
+        print("Message deleted")
+    except ClientError as e:
+        print(e.response['Error']['Message'])
 
 def get_message():
     try:
@@ -37,9 +45,9 @@ def get_message():
             print(f"Word: {word}")
 
         # If there is no message in the queue, print a message and exit    
-        #else:
-           # print("No message in the queue")
-            #exit(1)
+        else:
+            print("No message in the queue")
+            exit(1)
             
     # Handle any errors that may occur connecting to SQS
     except ClientError as e:
